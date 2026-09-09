@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Waiting Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stage-a: #1b120e;
+    --stage-b: #241813;
+    --paper: #f6efdc;
+    --paper-edge: #ece2c7;
+    --ink: #2a2116;
+    --ink-soft: #6b5d45;
+    --gold: #b3843d;
+    --gold-light: #d9b876;
+    --burgundy: #6f1f2a;
+    --burgundy-soft: rgba(111, 31, 42, 0.16);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  body{
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% 20%, var(--stage-b) 0%, var(--stage-a) 70%);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 56px 16px 90px;
+  }
+
+  .ticket{
+    width: 100%;
+    max-width: 580px;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.02),
+        rgba(0,0,0,0.02) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      var(--paper);
+    border: 1px solid var(--gold);
+    box-shadow:
+      0 2px 0 var(--gold-light) inset,
+      0 24px 60px rgba(0,0,0,0.55),
+      0 2px 8px rgba(0,0,0,0.4);
+    padding: 40px 42px 32px;
+    position: relative;
+  }
+
+  .ticket::before{
+    content: "";
+    position: absolute;
+    inset: 9px;
+    border: 1px solid rgba(179, 132, 61, 0.55);
+    pointer-events: none;
+  }
+
+  .corner{
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .corner svg{ width: 100%; height: 100%; display: block; }
+  .corner-tl{ top: -1px; left: -1px; }
+  .corner-tr{ top: -1px; right: -1px; transform: scaleX(-1); }
+  .corner-bl{ bottom: -1px; left: -1px; transform: scaleY(-1); }
+  .corner-br{ bottom: -1px; right: -1px; transform: scale(-1,-1); }
+
+  .emblem{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+  .emblem svg{ width: 42px; height: 42px; }
+
+  .letterhead{
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 16px;
+  }
+
+  .rule{
+    height: 6px;
+    margin: 0 auto 26px;
+    max-width: 340px;
+    border-top: 1px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
+  }
+
+  h1{
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+    font-size: 2.4rem;
+    text-align: center;
+    margin: 0 0 8px 0;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+
+  .intro{
+    font-size: 1.08rem;
+    color: var(--ink-soft);
+    text-align: center;
+    margin: 0 auto 30px;
+    max-width: 42ch;
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  .banner{
+    border: 1px solid var(--burgundy);
+    background: var(--burgundy-soft);
+    padding: 14px 18px;
+    margin: 0 auto 28px;
+    max-width: 420px;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.85rem;
+    color: var(--burgundy);
+    line-height: 1.55;
+    text-align: center;
+    opacity: 0;
+    transform: scale(1.3) rotate(-2deg);
+  }
+
+  .banner.show{
+    animation: stampIn 0.5s cubic-bezier(.2,.8,.3,1.2) forwards;
+  }
+
+  @keyframes stampIn{
+    0%{ opacity: 0; transform: scale(1.5) rotate(-4deg); }
+    60%{ opacity: 1; transform: scale(0.96) rotate(-2deg); }
+    100%{ opacity: 1; transform: scale(1) rotate(-2deg); }
+  }
+
+  .field{
+    margin-bottom: 26px;
+    text-align: center;
+  }
+
+  .label{
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .seal{
+    width: 148px;
+    height: 148px;
+    margin: 0 auto;
+    border: 2px solid var(--burgundy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transform: rotate(-3deg);
+  }
+  .seal::before{
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+  }
+
+  #ticketNumber{
+    font-family: 'Special Elite', monospace;
+    font-size: 1.7rem;
+    color: var(--burgundy);
+    letter-spacing: 1px;
+  }
+
+  #waitTime{
+    font-family: 'Special Elite', monospace;
+    font-size: 1.2rem;
+    color: var(--ink);
+  }
+
+  .logField .label{
+    margin-bottom: 10px;
+  }
+
+  .logList{
+    height: 172px;
+    overflow-y: auto;
+    border: 1px solid var(--gold);
+    background:
+      repeating-linear-gradient(
+        var(--paper-edge),
+        var(--paper-edge) 27px,
+        rgba(179,132,61,0.28) 28px
+      );
+    padding: 10px 16px;
+    text-align: left;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    line-height: 28px;
+  }
+
+  .logEntry{
+    margin: 0;
+    opacity: 0;
+    transform: translateY(3px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .logEntry.show{
+    animation: entryIn 0.5s ease forwards;
+  }
+
+  @keyframes entryIn{
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .logEntry .time{
+    color: var(--gold);
+    opacity: 0.9;
+    margin-right: 8px;
+  }
+
+  .notice{
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gold);
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .notice p{
+    margin: 0 0 6px 0;
+  }
+
+  .visits{
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--gold-light);
+    margin-top: 18px;
+    opacity: 0.75;
+  }
+
+  @media (max-width: 520px){
+    .ticket{ padding: 30px 22px 26px; }
+    h1{ font-size: 1.9rem; }
+    .seal{ width: 128px; height: 128px; }
+    #ticketNumber{ font-size: 1.45rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .banner, .logEntry{
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="ticket">
+    <div class="corner corner-tl"><svg viewBox="0 0 40 40"><path d="M2 38 L2 14 Q2 2 14 2 L38 2" stroke="#b3843d" stroke-width="1.4" fill="none"/><circle cx="14" cy="2" r="1.6" fill="#b3843d"/><circle cx="2" cy="14" r="1.6" fill="#b3843d"/></svg></div>
+    <div class="corner corner-tr"><svg viewBox="0 0 40 40"><path d="M2 38 L2 14 Q2 2 14 2 L38 2" stroke="#b3843d" stroke-width="1.4" fill="none"/><circle cx="14" cy="2" r="1.6" fill="#b3843d"/><circle cx="2" cy="14" r="1.6" fill="#b3843d"/></svg></div>
+    <div class="corner corner-bl"><svg viewBox="0 0 40 40"><path d="M2 38 L2 14 Q2 2 14 2 L38 2" stroke="#b3843d" stroke-width="1.4" fill="none"/><circle cx="14" cy="2" r="1.6" fill="#b3843d"/><circle cx="2" cy="14" r="1.6" fill="#b3843d"/></svg></div>
+    <div class="corner corner-br"><svg viewBox="0 0 40 40"><path d="M2 38 L2 14 Q2 2 14 2 L38 2" stroke="#b3843d" stroke-width="1.4" fill="none"/><circle cx="14" cy="2" r="1.6" fill="#b3843d"/><circle cx="2" cy="14" r="1.6" fill="#b3843d"/></svg></div>
+
+    <div class="emblem">
+      <svg viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="21" fill="none" stroke="#b3843d" stroke-width="1.2"/>
+        <circle cx="24" cy="24" r="16" fill="none" stroke="#b3843d" stroke-width="1"/>
+        <path d="M24 10 L26.6 20.3 L37 21 L28 27.4 L31 38 L24 31.4 L17 38 L20 27.4 L11 21 L21.4 20.3 Z" fill="none" stroke="#6f1f2a" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <div class="letterhead">Department of general processing</div>
+    <div class="rule"></div>
+
+    <h1>The Waiting Room</h1>
+    <p class="intro">You have entered the queue. A ticket has been issued to you, and you will be attended to in the order in which your request was received, or possibly not.</p>
+
+    <div class="banner" id="welcomeBanner" hidden></div>
+
+    <div class="field">
+      <div class="label">Ticket number</div>
+      <div class="seal"><div class="value" id="ticketNumber">000000</div></div>
+    </div>
+
+    <div class="field">
+      <div class="label">Estimated waiting time</div>
+      <div class="value" id="waitTime">0 hours, 0 minutes, 0 seconds</div>
+    </div>
+
+    <div class="field logField">
+      <div class="label">Activity</div>
+      <div class="logList" id="logList"></div>
+    </div>
+
+    <div class="notice">
+      <p>Your request continues through the system, according to its own schedule.</p>
+      <p>You may leave, you may close this window, and you may come back tomorrow, or next week, or whenever you like.</p>
+      <p>Your ticket will still be here, still moving through channels, however slowly.</p>
+    </div>
+
+    <div class="visits" id="visits"></div>
+  </main>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "waitingRoomData";
+  var SESSION_KEY = "waitingRoomSession";
+
+  var messages = [
+    "Your request has been received.",
+    "Your request has been assigned to Department 4.",
+    "Department 4 has acknowledged your request.",
+    "Your request is currently being reviewed.",
+    "Your request has been placed on hold.",
+    "Your request has been removed from hold.",
+    "Your request has been reviewed.",
+    "Your request has been sent back to Department 4.",
+    "Your request has been reassigned to Department 7.",
+    "Department 7 has requested additional information.",
+    "Your file has been misplaced.",
+    "Your file has been located.",
+    "Your request has been escalated.",
+    "Your request has been returned to normal priority.",
+    "A supervisor has been notified.",
+    "The supervisor is currently unavailable.",
+    "Your position in queue has been recalculated.",
+    "Your request remains in queue.",
+    "Your request has been forwarded for signature.",
+    "The signature could not be verified.",
+    "Your request has been resubmitted.",
+    "Your request has been logged for internal review.",
+    "Your request has been noted.",
+    "Your request has been transferred to a different desk."
+  ];
+
+  function randInt(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function generateTicket(){
+    return String(randInt(100000, 999999));
+  }
+
+  function loadData(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function persist(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }catch(e){
+      // storage unavailable, the queue continues regardless
+    }
+  }
+
+  var ticketEl = document.getElementById("ticketNumber");
+  var waitEl = document.getElementById("waitTime");
+  var logEl = document.getElementById("logList");
+  var bannerEl = document.getElementById("welcomeBanner");
+  var visitsEl = document.getElementById("visits");
+
+  var isNewSession = !sessionStorage.getItem(SESSION_KEY);
+  sessionStorage.setItem(SESSION_KEY, "1");
+
+  var data = loadData();
+  var showWelcome = false;
+
+  if (!data){
+    data = {
+      ticket: generateTicket(),
+      waitSeconds: randInt(14400, 32400),
+      log: [],
+      visits: 1,
+      createdAt: Date.now(),
+      lastTick: Date.now()
+    };
+    data.log.push({ msg: messages[0], t: Date.now() });
+  } else {
+    var now = Date.now();
+    var elapsedSec = Math.floor((now - data.lastTick) / 1000);
+    if (elapsedSec > 0){
+      data.waitSeconds -= elapsedSec;
+    }
+
+    if (isNewSession){
+      data.visits = (data.visits || 1) + 1;
+      var jitter = randInt(-1800, 2700);
+      data.waitSeconds += jitter;
+      showWelcome = true;
+    }
+
+    if (data.waitSeconds <= 0){
+      data.waitSeconds = randInt(14400, 32400);
+      data.log.push({ msg: "Your request has been reopened.", t: Date.now() });
+    }
+
+    data.lastTick = now;
+  }
+
+  persist();
+
+  function formatWait(totalSeconds){
+    totalSeconds = Math.max(0, totalSeconds);
+    var h = Math.floor(totalSeconds / 3600);
+    var m = Math.floor((totalSeconds % 3600) / 60);
+    var s = totalSeconds % 60;
+    return h + " hours, " + m + " minutes, " + s + " seconds";
+  }
+
+  function formatTime(ts){
+    return new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
+  function renderTicket(){
+    ticketEl.textContent = data.ticket;
+  }
+
+  function renderLogEntry(entry, animate){
+    var row = document.createElement("div");
+    row.className = "logEntry" + (animate ? "" : " show");
+    var time = document.createElement("span");
+    time.className = "time";
+    time.textContent = formatTime(entry.t);
+    row.appendChild(time);
+    row.appendChild(document.createTextNode(entry.msg));
+    logEl.appendChild(row);
+    if (animate){
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          row.classList.add("show");
+        });
+      });
+    }
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function renderInitialLog(){
+    logEl.innerHTML = "";
+    data.log.forEach(function(entry){
+      renderLogEntry(entry, false);
+    });
+  }
+
+  function renderVisits(){
+    visitsEl.textContent = "This is visit " + (data.visits || 1) + ", since your ticket was issued.";
+  }
+
+  renderTicket();
+  renderInitialLog();
+  renderVisits();
+
+  if (showWelcome){
+    bannerEl.hidden = false;
+    bannerEl.textContent = "Welcome back. Your ticket is still being processed. Maybe the waiting time has decreased. Maybe it increased.";
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        bannerEl.classList.add("show");
+      });
+    });
+  }
+
+  var currentWait = data.waitSeconds;
+  waitEl.textContent = formatWait(currentWait);
+
+  setInterval(function(){
+    currentWait -= 1;
+    if (currentWait <= 0){
+      currentWait = randInt(14400, 32400);
+      pushMessage("Your request has been reopened.");
+    }
+    waitEl.textContent = formatWait(currentWait);
+  }, 1000);
+
+  var lastMessage = data.log.length ? data.log[data.log.length - 1].msg : null;
+
+  function pickMessage(){
+    var pool = messages.filter(function(m){ return m !== lastMessage; });
+    var choice = pool[randInt(0, pool.length - 1)];
+    lastMessage = choice;
+    return choice;
+  }
+
+  function pushMessage(text){
+    var entry = { msg: text, t: Date.now() };
+    data.log.push(entry);
+    if (data.log.length > 60){
+      data.log = data.log.slice(data.log.length - 60);
+    }
+    renderLogEntry(entry, true);
+  }
+
+  function scheduleNextMessage(){
+    var delay = randInt(14000, 32000);
+    setTimeout(function(){
+      pushMessage(pickMessage());
+      if (Math.random() < 0.35){
+        var nudge = randInt(-900, 1500);
+        currentWait += nudge;
+        if (currentWait < 0){ currentWait = randInt(1800, 7200); }
+      }
+      scheduleNextMessage();
+    }, delay);
+  }
+
+  scheduleNextMessage();
+
+  function saveNow(){
+    data.waitSeconds = currentWait;
+    data.lastTick = Date.now();
+    persist();
+  }
+
+  setInterval(saveNow, 6000);
+  window.addEventListener("beforeunload", saveNow);
+  window.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "hidden"){
+      saveNow();
+    }
+  });
+})();
+</script>
+</body>
+</html>
